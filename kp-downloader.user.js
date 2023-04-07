@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         KinoPub Download button
 // @namespace    http://tampermonkey/
-// @version      0.1003
+// @version      0.1004
 // @description  Injects a dropdown button to download the current episode/movie from KinoPub website
 // @author       MrModest
 // @match        https://*.kinopub.ru/item/view/*
@@ -47,12 +47,12 @@
 
     const dropdownHtml = getDropdownEl(options);
 
-    getInjectRoot().appendChild(dropdownHtml);
+    getInjectRoot(isTvSeries).appendChild(dropdownHtml, isTvSeries);
   }
 
 
   function getEpisodeData() {
-    const data = window.location.pathname.matchAll(/\/item\/view\/(\d+)\/s(\d+)e(\d+)/g).next(); // '/item/view/12939/s1e2'
+    const data = window.location.pathname.matchAll(/\/item\/view\/(\d+)(\/s(\d+)e(\d+))?/g).next(); // '/item/view/12939/s1e2'
     return ({
       mediaId: data.value[1],
       season: data.value[2] || 0,
@@ -60,8 +60,11 @@
     });
   }
 
-  function getInjectRoot() {
-    return document.querySelector('.season-title').parentElement;
+  function getInjectRoot(isTvSeries) {
+    if (isTvSeries) {
+      return document.querySelector('.season-title').parentElement;
+    }
+    return document.querySelector('#movie-status').parentElement;
   }
 
   /**
@@ -69,13 +72,14 @@
    * @param {DropdownItem[]} options 
    * @returns 
    */
-  function getDropdownEl(options) {
+  function getDropdownEl(options, isTvSeries) {
     const wrapper = document.createElement('div');
+    const filename = isTvSeries ? options[0].filename : "Movie";
 
     wrapper.innerHTML = `
       <span class="dropdown">
         <button class="btn btn-secondary dropdown-toggle btn-outline-success m-b-sm" type="button" id="downloadButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Download (${options[0].fileName})
+          Download (${filename})
         </button>
         <div class="dropdown-menu" aria-labelledby="downloadButton">
           ${
