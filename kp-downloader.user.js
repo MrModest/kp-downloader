@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         KinoPub Download button
 // @namespace    http://tampermonkey/
-// @version      0.1002
+// @version      0.1003
 // @description  Injects a dropdown button to download the current episode/movie from KinoPub website
 // @author       MrModest
 // @match        https://*.kinopub.ru/item/view/*
@@ -75,7 +75,7 @@
     wrapper.innerHTML = `
       <span class="dropdown">
         <button class="btn btn-secondary dropdown-toggle btn-outline-success m-b-sm" type="button" id="downloadButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Download
+          Download (${e.fileName})
         </button>
         <div class="dropdown-menu" aria-labelledby="downloadButton">
           ${
@@ -126,7 +126,7 @@
 
     return episodes
       .flatMap(e => {
-        const fileName = isTvSeries ? `e${e.number}` : encodeForbiddenChars(media.title);
+        const fileName = isTvSeries ? `s${e.snumber}e${e.number}` : encodeForbiddenChars(media.title);
         const fileExt = e.files[0].file.split('.')[1];
 
         return ({
