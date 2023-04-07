@@ -45,10 +45,10 @@
         filename: episode.filename
       }));
 
-    const dropdownHtml = getDropdownEl(options);
+    const dropdownHtml = getDropdownEl(options, isTvSeries);
 
     const rootEl = getInjectRoot(isTvSeries);
-    rootEl.appendChild(dropdownHtml, isTvSeries);
+    rootEl.appendChild(dropdownHtml);
     if (isTvSeries) {
       rootEl.appendChild(getDownloadBulkDropdownEl(media, '1080p', episode.season))
     }
