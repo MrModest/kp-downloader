@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         KinoPub Download button
 // @namespace    http://tampermonkey/
-// @version      0.1004
+// @version      0.1006
 // @description  Injects a dropdown button to download the current episode/movie from KinoPub website
 // @author       MrModest
 // @match        https://*.kinopub.ru/item/view/*
@@ -47,7 +47,11 @@
 
     const dropdownHtml = getDropdownEl(options);
 
-    getInjectRoot(isTvSeries).appendChild(dropdownHtml, isTvSeries);
+    const rootEl = getInjectRoot(isTvSeries);
+    rootEl.appendChild(dropdownHtml, isTvSeries);
+    if (isTvSeries) {
+      rootEl.appendChild(getDownloadBulkDropdownEl(media, '1080p', episode.season))
+    }
   }
 
 
@@ -87,6 +91,29 @@
               .map(o => `<a class="dropdown-item" href="${o.url}" download="${o.filename}">${o.text}</a>`)
               .join('\n')
           }
+        </div>
+      </span>
+    `;
+
+    return wrapper.firstElementChild;
+  }
+
+  function getDownloadBulkDropdownEl(media, quality, season) {
+    const downloadMeta = 'data:text/json;charset=utf-8,'
+
+    const wrapper = document.createElement('div');
+    const filename = `JDownloader2${season ? '-' + season : ''}.crawljob`;
+    const jsonSeson = downloadMeta + encodeURIComponent(JSON.stringify(getCrawljobJson(media, quality, season)));
+    const jsonAll = downloadMeta + encodeURIComponent(JSON.stringify(getCrawljobJson(media, quality)));
+
+    wrapper.innerHTML = `
+      <span class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle btn-outline-success m-b-sm" type="button" id="downloadButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download (.crawlJob)
+        </button>
+        <div class="dropdown-menu" aria-labelledby="downloadButton">
+          <a class="dropdown-item" href="${jsonSeson}" download="${filename}">Весь сезон (${season})</a>
+          <a class="dropdown-item" href="${jsonAll}" download="${filename}">Весь Сериал</a>
         </div>
       </span>
     `;
