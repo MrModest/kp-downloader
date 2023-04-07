@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey/
 // @version      0.1
 // @description  Injects a dropdown button to download the current episode/movie from KinoPub website
-// @author       Your name
+// @author       MrModest
 // @match        https://*.kinopub.ru/item/view/*
 // @match        https://*.qil.ovh/item/view/*
 // @grant        none
