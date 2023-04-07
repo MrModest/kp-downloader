@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         KinoPub Download button
 // @namespace    http://tampermonkey/
-// @version      0.1001
+// @version      0.1002
 // @description  Injects a dropdown button to download the current episode/movie from KinoPub website
 // @author       MrModest
 // @match        https://*.kinopub.ru/item/view/*
@@ -73,7 +73,7 @@
     const wrapper = document.createElement('div');
 
     wrapper.innerHTML = `
-      <div class="dropdown">
+      <span class="dropdown">
         <button class="btn btn-secondary dropdown-toggle btn-outline-success m-b-sm" type="button" id="downloadButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Download
         </button>
@@ -84,7 +84,7 @@
               .join('\n')
           }
         </div>
-      </div>
+      </span>
     `;
 
     return wrapper.firstElementChild;
