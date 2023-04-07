@@ -5,6 +5,7 @@ Install [Tampermonkey](https://www.tampermonkey.net/) extension first. Than clin
 # JDownloader2
 
 If you use this download manager, the script gives you a `.crawljob` file for bulk downloading of the whole season or the whole TV Show.
+More details here: https://support.jdownloader.org/Knowledgebase/Article/View/folder-watch-basic-usage/23
 
 # How it looks like
 
