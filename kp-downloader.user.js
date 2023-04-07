@@ -33,7 +33,7 @@
 
     const allEpisodes = getEpisodeUrls(media)
 
-    const episode = !isTvSeries 
+    const episode = isTvSeries 
       ? allEpisodes
           .find(e => e.season === episodeData.season && e.episode === episodeData.episode)
       : allEpisodes[0];
@@ -59,8 +59,8 @@
     const data = window.location.pathname.matchAll(/\/item\/view\/(\d+)(\/s(\d+)e(\d+))?/g).next(); // '/item/view/12939/s1e2'
     return ({
       mediaId: data.value[1],
-      season: data.value[2] || 0,
-      episode: data.value[3] || 1
+      season: parseInt(data.value[3]) || 0,
+      episode: parseInt(data.value[4]) || 1
     });
   }
 
