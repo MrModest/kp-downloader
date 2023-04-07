@@ -75,7 +75,7 @@
     wrapper.innerHTML = `
       <span class="dropdown">
         <button class="btn btn-secondary dropdown-toggle btn-outline-success m-b-sm" type="button" id="downloadButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Download (${e.fileName})
+          Download (${o.fileName})
         </button>
         <div class="dropdown-menu" aria-labelledby="downloadButton">
           ${
