@@ -104,11 +104,11 @@
       if (!response || response.status !== 200) {
         throw new Error(`Request finished with status ${(response || {}).status}`, { cause: response })
       }
+      return response.item;
     } catch (error) {
       console.log('Error occur when tried to fetch movie data!', error)
       throw new Error(`Can't fetch the data for movie ${mediaId}!`, { cause: error })
     }
-    return response.item;
   }
 
   /**
