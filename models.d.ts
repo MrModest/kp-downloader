@@ -142,7 +142,7 @@ export interface URL {
 }
 
 export interface Subtitle {
-    lang:   SubtitleLang;
+    lang:   string;
     shift:  number;
     embed:  boolean;
     forced: boolean;
@@ -154,6 +154,7 @@ export enum SubtitleLang {
     Eng = "eng",
     Fre = "fre",
     Rus = "rus",
+    Ger = "ger"
 }
 
 export interface EpisodeWatching {

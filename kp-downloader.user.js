@@ -45,12 +45,22 @@
         filename: episode.filename
       }));
 
-    const dropdownHtml = getDropdownEl(options, isTvSeries);
+    const subtitles = episode.subtitles
+      .map(s => ({
+        url: s.url,
+        text: s.lang,
+        filename: s.filename
+      }))
+
+    const qualityDropdownHtml = getDropdownEl(options, isTvSeries, 'Movie');
+    const subtitlesDropdownHtml = getDropdownEl(subtitles, isTvSeries, 'Subtitles');
 
     const rootEl = getInjectRoot(isTvSeries);
-    rootEl.appendChild(dropdownHtml);
+    rootEl.appendChild(qualityDropdownHtml);
+    rootEl.appendChild(subtitlesDropdownHtml);
     if (isTvSeries) {
       rootEl.appendChild(getDownloadBulkDropdownEl(media, '1080p', episode.season))
+      rootEl.appendChild(getDownloadSubtitlesBulkDropdownEl(media, subtitles.map(s => s.text), episode.season))
     }
   }
 
@@ -76,9 +86,9 @@
    * @param {DropdownItem[]} options 
    * @returns 
    */
-  function getDropdownEl(options, isTvSeries) {
+  function getDropdownEl(options, isTvSeries, defaultName) {
     const wrapper = document.createElement('div');
-    const filename = isTvSeries ? options[0].filename : "Movie";
+    const filename = (!isTvSeries || defaultName === 'Subtitles') ? defaultName : options[0].filename;
 
     wrapper.innerHTML = `
       <span class="dropdown">
@@ -88,7 +98,7 @@
         <div class="dropdown-menu" aria-labelledby="downloadButton">
           ${
             options
-              .map(o => `<a class="dropdown-item" href="${o.url}" download="${o.filename}">${o.text}</a>`)
+              .map(o => `<a class="dropdown-item" href="${o.url}" download="${o.filename}" style="font-family: monospace, monospace;">${o.text}</a>`)
               .join('\n')
           }
         </div>
@@ -112,8 +122,49 @@
           Download (.crawlJob)
         </button>
         <div class="dropdown-menu" aria-labelledby="downloadButton">
-          <a class="dropdown-item" href="${jsonSeson}" download="${filename}">Весь сезон (${season})</a>
-          <a class="dropdown-item" href="${jsonAll}" download="${filename}">Весь Сериал</a>
+          <a class="dropdown-item" href="${jsonSeson}" download="${filename}">Whole season (${season})</a>
+          <a class="dropdown-item" href="${jsonAll}" download="${filename}">Whole TV Series</a>
+        </div>
+      </span>
+    `;
+
+    return wrapper.firstElementChild;
+  }
+
+  /**
+   * Get media by id
+   * @param {Item} media
+   * @param {string[]} subLangs
+   * @param {number} season
+   * @returns {Promise<Item>}
+   */
+  function getDownloadSubtitlesBulkDropdownEl(media, subLangs, season) {
+    const downloadMeta = 'data:text/json;charset=utf-8,'
+
+    const wrapper = document.createElement('div');
+
+    const options = subLangs.map(lang => ({
+      lang: lang,
+      filename: `JDownloader2${season ? '-' + season : ''}-${lang}.crawljob`,
+      jsonSeson: downloadMeta + encodeURIComponent(JSON.stringify(getCrawljobJsonForSubtitles(media, lang, season))),
+      jsonAll: downloadMeta + encodeURIComponent(JSON.stringify(getCrawljobJsonForSubtitles(media, lang)))
+    }))
+
+    wrapper.innerHTML = `
+      <span class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle btn-outline-success m-b-sm" type="button" id="downloadButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download subtitles (.crawlJob)
+        </button>
+        <div class="dropdown-menu" aria-labelledby="downloadButton">
+          ${
+            options
+              .map(o => `
+                <span>- - ${o.lang} - -<span>
+                <a class="dropdown-item" href="${o.jsonSeson}" download="${o.filename}">For whole season (${season})</a>
+                <a class="dropdown-item" href="${o.jsonAll}" download="${o.filename}">For whole TV Series</a>
+              `)
+              .join('\n')
+          }
         </div>
       </span>
     `;
@@ -144,8 +195,7 @@
 
   /**
    * Get download urls with particular video quality
-   * @param {Item} media 
-   * @param {string} quality
+   * @param {Item} media
    * @returns 
    */
   function getEpisodeUrls(media) {
@@ -159,9 +209,18 @@
       .flatMap(e => {
         const fileName = isTvSeries ? `s${e.snumber}e${e.number}` : encodeForbiddenChars(media.title);
         const fileExt = e.files[0].file.split('.')[1];
+        const subFileExt = e.subtitles[0].file.split('.')[1];
 
         return ({
-          options: e.files.map(f => ({ quality: f.quality, url: f.url.http })),
+          options: e.files.map(f => ({ 
+            quality: f.quality,
+            url: f.url.http 
+          })),
+          subtitles: distinctBy(e.subtitles, s => s.lang).map(f => ({  // choose only one option per language
+            filename: `${fileName}-${f.lang}.${subFileExt}`,
+            lang: f.lang,
+            url: f.url
+          })),
           filename: `${fileName}.${fileExt}`,
           episode: e.number,
           season: e.snumber,
@@ -183,7 +242,7 @@
 
     return episodes
       .filter(e => season === undefined || e.season === season)
-      .flatMap(e => 
+      .map(e => 
         ({
           text: e.options.find(f => f.quality === quality).url,
           filename: `e${e.episode}.mp4`,
@@ -194,9 +253,57 @@
       )
   }
 
+  /**
+   * Get `.crawljob` json for bulk download via JDownloader2
+   * @param {Item} media 
+   * @param {string} quality
+   * @param {number|undefined} season if spesified, considers only specific season
+   * @returns 
+   */
+  function getCrawljobJsonForSubtitles(media, subLang, season) {
+    subLang = subLang || 'eng';
+    const episodes = getEpisodeUrls(media)
+
+    return episodes
+      .filter(e => season === undefined || e.season === season)
+      .map(e => {
+        const sub = e.subtitles.find(s => s.lang === subLang)
+
+        return ({
+          text: sub.url,
+          filename: sub.filename,
+          packageName: `s${e.season}`,
+          autoStart: "TRUE",
+          autoConfirm: "TRUE"
+        })
+      })
+  }
+
   /* Utilitis */
+
+  /**
+   * Encode forbidden chars
+   * @param {string} str 
+   * @returns {string} encoded string
+   */
   function encodeForbiddenChars(str) {
     const forbiddenChars = /[<>:"/\\|?*]/g;
     return str.replace(forbiddenChars, '_');
+  }
+
+  /**
+   * Distinct values by property
+   * @template T
+   * @param {T[]} array 
+   * @param {function(T):any} selector
+   * @returns only unique by the property elements
+   */
+  function distinctBy(array, selector) {
+    return array.filter(
+      function(el) {
+        const key = selector(el);
+        return !this.has(key) && this.add(key);
+      },
+      new Set);
   }
 })();
