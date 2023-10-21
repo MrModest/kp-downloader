@@ -5,6 +5,7 @@
 // @description  Injects a dropdown button to download the current episode/movie from KinoPub website
 // @author       MrModest
 // @match        https://*.kinopub.ru/item/view/*
+// @match        https://kino.pub/item/view/*
 // @match        https://*.qil.ovh/item/view/*
 // @grant        none
 // ==/UserScript==
