@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         KinoPub Download button
 // @namespace    http://tampermonkey/
-// @version      0.1007
+// @version      0.1008
 // @description  Injects a dropdown button to download the current episode/movie from KinoPub website
 // @author       MrModest
 // @match        https://*.kinopub.ru/item/view/*
