@@ -210,7 +210,10 @@
       .flatMap(e => {
         const fileName = isTvSeries ? `s${e.snumber}e${e.number}` : encodeForbiddenChars(media.title);
         const fileExt = e.files[0].file.split('.')[1];
-        const subFileExt = e.subtitles[0].file.split('.')[1];
+        let subFileExt = 'no-subs';
+        if (e.subtitles.length > 0) {
+            subFileExt = e.subtitles[0].file.split('.')[1];
+        }
 
         return ({
           options: e.files.map(f => ({ 
