@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         KinoPub Download button
 // @namespace    http://tampermonkey/
-// @version      0.1009
+// @version      0.1010
 // @description  Injects a dropdown button to download the current episode/movie from KinoPub website
 // @author       MrModest
 // @match        https://*.kinopub.ru/item/view/*
@@ -77,7 +77,7 @@
 
   function getInjectRoot(isTvSeries) {
     if (isTvSeries) {
-      return document.querySelector('.season-title').parentElement;
+      return document.querySelector('button[data-target="#report"]').parentElement;
     }
     return document.querySelector('#movie-status').parentElement;
   }
