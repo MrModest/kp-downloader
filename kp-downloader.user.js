@@ -92,7 +92,7 @@
     const filename = (!isTvSeries || defaultName === 'Subtitles') ? defaultName : options[0].filename;
 
     wrapper.innerHTML = `
-      <span class="dropdown">
+      <div class="btn-group" style="padding: 5px">
         <button class="btn btn-outline b-success btn-sm dropdown-toggle" type="button" id="downloadButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Download (${filename})
         </button>
@@ -103,7 +103,7 @@
               .join('\n')
           }
         </div>
-      </span>
+      </div>
     `;
 
     return wrapper.firstElementChild;
@@ -118,15 +118,15 @@
     const jsonAll = downloadMeta + encodeURIComponent(JSON.stringify(getCrawljobJson(media, quality)));
 
     wrapper.innerHTML = `
-      <span class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle btn-outline-success m-b-sm" type="button" id="downloadButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <div class="btn-group" style="padding: 5px">
+        <button class="btn btn-outline b-success btn-sm dropdown-toggle" type="button" id="downloadButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Download (.crawlJob)
         </button>
         <div class="dropdown-menu" aria-labelledby="downloadButton">
           <a class="dropdown-item" href="${jsonSeson}" download="${filename}">Whole season (${season})</a>
           <a class="dropdown-item" href="${jsonAll}" download="${filename}">Whole TV Series</a>
         </div>
-      </span>
+      </div>
     `;
 
     return wrapper.firstElementChild;
@@ -152,8 +152,8 @@
     }))
 
     wrapper.innerHTML = `
-      <span class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle btn-outline-success m-b-sm" type="button" id="downloadButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <div class="btn-group" style="padding: 5px">
+        <button class="btn btn-outline b-success btn-sm dropdown-toggle" type="button" id="downloadButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Download subtitles (.crawlJob)
         </button>
         <div class="dropdown-menu" aria-labelledby="downloadButton">
@@ -167,7 +167,7 @@
               .join('\n')
           }
         </div>
-      </span>
+      </div>
     `;
 
     return wrapper.firstElementChild;
